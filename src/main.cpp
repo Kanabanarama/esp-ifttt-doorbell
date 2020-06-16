@@ -11,7 +11,7 @@
 #include <ESP8266HTTPClient.h>
 
 #define sensorPin D1
-#define wpsPin D4
+#define wpsPin D3
 
 const char* ifttt_event = "---YOUR IFTTT EVENT---";
 const char* ifttt_key = "---YOUR IFTT KEY---";
