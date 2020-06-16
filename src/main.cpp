@@ -11,9 +11,7 @@
 #include <ESP8266HTTPClient.h>
 
 #define sensorPin D1
-
-const char* wifi_ssid     = "---YOUR SSID---";
-const char* wifi_password = "---YOUR WIFI PASSWORD---";
+#define wpsPin D4
 
 const char* ifttt_event = "---YOUR IFTTT EVENT---";
 const char* ifttt_key = "---YOUR IFTT KEY---";
@@ -50,28 +48,57 @@ void checkIfCallHasToBeMade() {
   http.end();
 }
 
+bool startWpsConfiguration() {
+  Serial.println("WPS-Konfiguration gestartet.");
+  bool wpsSuccess = WiFi.beginWPSConfig();
+  if(wpsSuccess) {
+      String newSSID = WiFi.SSID();
+      if(newSSID.length() > 0) {
+        Serial.printf("WPS-Konfiguration erfolgreich. SSID: '%s'\n", newSSID.c_str());
+      } else {
+        wpsSuccess = false;
+      }
+  }
+  return wpsSuccess;
+}
+
 void setup()
 {
+    pinMode(wpsPin, INPUT_PULLUP);
     pinMode(sensorPin, INPUT);
 
     Serial.begin(9600);
     delay(1000);
 
-    Serial.println();
-    Serial.print("Connecting to: ");
-    Serial.println(wifi_ssid);
+    WiFi.mode(WIFI_STA);
 
-    WiFi.begin(wifi_ssid, wifi_password);
+    String wifiSSID = WiFi.SSID().c_str();
+    String wifiPSK = WiFi.psk().c_str();
 
-    while (WiFi.status() != WL_CONNECTED) {
+    if(wifiSSID.length() > 0) {
+      WiFi.begin(wifiSSID, wifiPSK);
+      int retry = 0;
+      while ((WiFi.status() == WL_DISCONNECTED) && (retry < 10)) {
         delay(500);
         Serial.print(".");
-    }
+        retry++;
+      }
 
-    Serial.println();
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+      wl_status_t status = WiFi.status();
+      if(status == WL_CONNECTED) {
+        Serial.println("verbunden.");
+        Serial.printf("SSID: '%s'\n", WiFi.SSID().c_str());
+        Serial.printf("IP address: '%s'", WiFi.localIP().toString().c_str());
+      }
+    } else {
+      Serial.println("Keine WiFi Verbindung möglich.");
+      Serial.println("Bitte WPS Taste am Router und am Gerät drücken.");
+
+      while(digitalRead(wpsPin)!=0) { yield(); }
+      if(!startWpsConfiguration()) {
+         Serial.println("WPS-Konfiguration fehlgeschlagen.");
+      }
+    }
 
     attachInterrupt(digitalPinToInterrupt(sensorPin), ISRoutine, RISING);
 }
