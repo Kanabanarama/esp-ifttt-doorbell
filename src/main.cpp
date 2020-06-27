@@ -11,6 +11,7 @@
 #include <ESP8266HTTPClient.h>
 
 #define sensorPin D1
+#define sensorPinInverted D2
 #define wpsPin D3
 
 const char* ifttt_event = "---YOUR IFTTT EVENT---";
@@ -19,17 +20,17 @@ const char* ifttt_key = "---YOUR IFTT KEY---";
 const char* host = "https://maker.ifttt.com";
 const char* path = "%s/trigger/%s/with/key/%s";
 
-bool makeTheCall = false;
+bool makeACall = false;
 
 // Interrupt routine that mustn't do much so it is not blocking
 void ICACHE_RAM_ATTR ISRoutine () {
-  makeTheCall = true;
+  makeACall = true;
 }
 
 void checkIfCallHasToBeMade() {
-  if(!makeTheCall || WiFi.status() != WL_CONNECTED) return;
+  if(!makeACall || WiFi.status() != WL_CONNECTED) return;
 
-  makeTheCall = false;
+  makeACall = false;
 
   HTTPClient http;
 
@@ -66,6 +67,7 @@ void setup()
 {
     pinMode(wpsPin, INPUT_PULLUP);
     pinMode(sensorPin, INPUT);
+    pinMode(sensorPinInverted, INPUT);
 
     Serial.begin(9600);
     delay(1000);
@@ -101,6 +103,7 @@ void setup()
     }
 
     attachInterrupt(digitalPinToInterrupt(sensorPin), ISRoutine, RISING);
+    attachInterrupt(digitalPinToInterrupt(sensorPinInverted), ISRoutine, FALLING);
 }
 
 void loop() {
