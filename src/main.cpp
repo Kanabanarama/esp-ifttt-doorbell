@@ -51,6 +51,7 @@ void checkIfCallHasToBeMade() {
 
 bool startWpsConfiguration() {
   Serial.println("WPS-Konfiguration gestartet.");
+  digitalWrite(LED_BUILTIN, LOW);
   bool wpsSuccess = WiFi.beginWPSConfig();
   if(wpsSuccess) {
       String newSSID = WiFi.SSID();
@@ -60,12 +61,15 @@ bool startWpsConfiguration() {
         wpsSuccess = false;
       }
   }
+  digitalWrite(LED_BUILTIN, HIGH);
   return wpsSuccess;
 }
 
 void setup()
 {
     pinMode(wpsPin, INPUT_PULLUP);
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
     pinMode(sensorPin, INPUT);
     pinMode(sensorPinInverted, INPUT);
 
