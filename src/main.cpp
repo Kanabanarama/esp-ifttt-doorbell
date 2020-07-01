@@ -20,17 +20,17 @@ String wifiHostname = "ESPKlingel-" + String(ESP.getChipId(), HEX);
 const char* host = "http://maker.ifttt.com";
 const char* path = "%s/trigger/%s/with/key/%s";
 
-bool makeACall = false;
+bool bellSignalDetected = false;
 
 // Interrupt routine that mustn't do much so it is not blocking
 void ICACHE_RAM_ATTR ISRoutine () {
-  makeACall = true;
+  bellSignalDetected = true;
 }
 
-void checkIfCallHasToBeMade() {
-  if(!makeACall || WiFi.status() != WL_CONNECTED) return;
+void call() {
+  if(WiFi.status() != WL_CONNECTED) return;
 
-  makeACall = false;
+  bellSignalDetected = false;
 
   WiFiClient client;
   HTTPClient http;
@@ -134,5 +134,5 @@ void setup()
 
 void loop() {
   wpsButton.read();
-  checkIfCallHasToBeMade();
+  if(bellSignalDetected) call();
 }
