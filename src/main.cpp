@@ -18,6 +18,8 @@
 
 EasyButton wpsButton(wpsPin);
 
+String wifiHostname = "ESPKlingel-" + String(ESP.getChipId(), HEX);
+
 const char* ifttt_event = "---YOUR IFTTT EVENT---";
 const char* ifttt_key = "---YOUR IFTT KEY---";
 
@@ -103,7 +105,7 @@ void setup()
     Serial.begin(9600);
     delay(1000);
 
-    Serial.println("Ready");
+    Serial.printf("Ready (%s)\n", wifiHostname.c_str());
 
     wpsButton.onPressed(startWpsConfiguration);
     wpsButton.onPressedFor(3000, eraseWpsConfiguration);
@@ -121,6 +123,7 @@ void setup()
 
     Serial.printf("Verbindung mit '%s' wird hergestellt.\n", wifiSSID.c_str());
     WiFi.begin(wifiSSID, wifiPSK);
+    WiFi.hostname(wifiHostname);
     WiFi.setAutoConnect(true);
     int retry = 0;
     while ((WiFi.status() == WL_DISCONNECTED) && (retry < 10)) {
