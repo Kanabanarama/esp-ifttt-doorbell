@@ -11,17 +11,11 @@
 #include <ESP8266HTTPClient.h>
 #include <EasyButton.h>
 
-#define sensorPin D1
-#define sensorPinInverted D2
-#define wpsPin D3
-#define wpsLed LED_BUILTIN
+#include "config.h"
 
-EasyButton wpsButton(wpsPin);
+EasyButton wpsButton(WPS_PIN);
 
 String wifiHostname = "ESPKlingel-" + String(ESP.getChipId(), HEX);
-
-const char* ifttt_event = "---YOUR IFTTT EVENT---";
-const char* ifttt_key = "---YOUR IFTT KEY---";
 
 const char* host = "http://maker.ifttt.com";
 const char* path = "%s/trigger/%s/with/key/%s";
@@ -42,7 +36,7 @@ void checkIfCallHasToBeMade() {
   HTTPClient http;
 
   char url[128];
-  sprintf(url, path, host, ifttt_event, ifttt_key);
+  sprintf(url, path, host, IFTTT_EVENT, IFTTT_KEY);
   Serial.printf("Request: '%s'\n", url);
 
   http.begin(client, url);
@@ -61,7 +55,7 @@ void checkIfCallHasToBeMade() {
 
 bool startWpsConfiguration() {
   Serial.println("WPS-Konfiguration gestartet.");
-  digitalWrite(wpsLed, LOW);
+  digitalWrite(WPS_LED, LOW);
   bool wpsSuccess = WiFi.beginWPSConfig();
   if(wpsSuccess) {
       String newSSID = WiFi.SSID();
@@ -73,17 +67,17 @@ bool startWpsConfiguration() {
   } else {
     Serial.println("WPS-Konfiguration fehlgeschlagen.");
   }
-  digitalWrite(wpsLed, HIGH);
+  digitalWrite(WPS_LED, HIGH);
   Serial.println(wpsSuccess);
   return wpsSuccess;
 }
 
 bool eraseWpsConfiguration() {
   Serial.println("Resetting WPS data.");
-  digitalWrite(wpsLed, LOW);
+  digitalWrite(WPS_LED, LOW);
   ESP.eraseConfig();
   delay(1000);
-  digitalWrite(wpsLed, HIGH);
+  digitalWrite(WPS_LED, HIGH);
   ESP.reset();
 
   return true;
@@ -91,11 +85,11 @@ bool eraseWpsConfiguration() {
 
 void setup()
 {
-    pinMode(wpsPin, INPUT_PULLUP);
-    pinMode(wpsLed, OUTPUT);
-    digitalWrite(wpsLed, HIGH);
-    pinMode(sensorPin, INPUT);
-    pinMode(sensorPinInverted, INPUT);
+    pinMode(WPS_PIN, INPUT_PULLUP);
+    pinMode(WPS_LED, OUTPUT);
+    digitalWrite(WPS_LED, HIGH);
+    pinMode(SENSOR_PIN, INPUT);
+    pinMode(SENSOR_PIN_INVERTED, INPUT);
 
     delay(1000);
     Serial.begin(9600);
@@ -134,8 +128,8 @@ void setup()
       Serial.printf("IP address: '%s'\n", WiFi.localIP().toString().c_str());
     }
 
-    attachInterrupt(digitalPinToInterrupt(sensorPin), ISRoutine, RISING);
-    attachInterrupt(digitalPinToInterrupt(sensorPinInverted), ISRoutine, FALLING);
+    attachInterrupt(digitalPinToInterrupt(SENSOR_PIN), ISRoutine, RISING);
+    attachInterrupt(digitalPinToInterrupt(SENSOR_PIN_INVERTED), ISRoutine, FALLING);
 }
 
 void loop() {
