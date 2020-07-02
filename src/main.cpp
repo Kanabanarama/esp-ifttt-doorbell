@@ -26,63 +26,62 @@ bool bellSignalDetected = false;
 
 // Interrupt routine that mustn't do much so it is not blocking
 void ICACHE_RAM_ATTR ISRoutine () {
-  bellSignalDetected = true;
+    bellSignalDetected = true;
 }
 
 void call() {
-  if(WiFi.status() != WL_CONNECTED) return;
+    if(WiFi.status() != WL_CONNECTED) return;
 
-  bellSignalDetected = false;
+    bellSignalDetected = false;
 
-  espLed.Breathe(1000).Repeat(3);
+    espLed.Breathe(1000).Repeat(3);
 
-  WiFiClient client;
-  HTTPClient http;
+    WiFiClient client;
+    HTTPClient http;
 
-  char url[128];
-  sprintf(url, path, host, IFTTT_EVENT, IFTTT_KEY);
-  Serial.printf("Request: '%s'\n", url);
+    char url[128];
+    sprintf(url, path, host, IFTTT_EVENT, IFTTT_KEY);
+    Serial.printf("Request: '%s'\n", url);
 
-  http.begin(client, url);
-  http.addHeader("Content-Type", "text/plain");
-  int httpCode = http.POST("Message from ESP8266");
-  String payload = http.getString();
+    http.begin(client, url);
+    http.addHeader("Content-Type", "text/plain");
+    int httpCode = http.POST("Message from ESP8266");
+    String payload = http.getString();
 
-  Serial.println("---ANTWORT:---");
-  Serial.println(httpCode);
-  Serial.println("--------------");
-  Serial.println(payload);
-  Serial.println("--------------");
+    Serial.println("---ANTWORT:---");
+    Serial.println(httpCode);
+    Serial.println("--------------");
+    Serial.println(payload);
+    Serial.println("--------------");
 
-  espLed.FadeOn(1000).DelayBefore(1000);
+    espLed.FadeOn(1000).DelayBefore(1000);
 
-  http.end();
+    http.end();
 }
 
 bool startWpsConfiguration() {
-  Serial.println("WPS-Konfiguration gestartet.");
-  espLed.On().Update();
-  bool wpsSuccess = WiFi.beginWPSConfig();
-  if(wpsSuccess) {
-      String newSSID = WiFi.SSID();
-      if(newSSID.length() > 0) {
-        Serial.printf("WPS-Konfiguration erfolgreich. SSID: '%s'\n", newSSID.c_str());
-      }
-  } else {
-    Serial.println("WPS-Konfiguration fehlgeschlagen.");
-  }
-  espLed.Off().Update();
-  return wpsSuccess;
+    Serial.println("WPS-Konfiguration gestartet.");
+    espLed.On().Update();
+    bool wpsSuccess = WiFi.beginWPSConfig();
+    if(wpsSuccess) {
+        String newSSID = WiFi.SSID();
+        if(newSSID.length() > 0) {
+            Serial.printf("WPS-Konfiguration erfolgreich. SSID: '%s'\n", newSSID.c_str());
+        }
+    } else {
+        Serial.println("WPS-Konfiguration fehlgeschlagen.");
+    }
+    espLed.Off().Update();
+    return wpsSuccess;
 }
 
 bool eraseWpsConfiguration() {
-  Serial.println("Resetting WPS data.");
-  espLed.On().DelayAfter(500).Update();
-  ESP.eraseConfig();
-  espLed.Off().Update();
-  ESP.reset();
-
-  return true;
+    Serial.println("WPS-Daten zurückgesetzt.");
+    espLed.On().DelayAfter(500).Update();
+    ESP.eraseConfig();
+    espLed.Off().Update();
+    ESP.reset();
+    return true;
 }
 
 void setup()
@@ -94,7 +93,7 @@ void setup()
     espLed.Off().Update();
 
     Serial.begin(9600);
-    Serial.printf("Ready (%s)\n", wifiHostname.c_str());
+    Serial.printf("Bereit (%s)\n", wifiHostname.c_str());
 
     wpsButton.onPressed(startWpsConfiguration);
     wpsButton.onPressedFor(3000, eraseWpsConfiguration);
@@ -105,9 +104,9 @@ void setup()
     String wifiPSK = WiFi.psk().c_str();
 
     if(wifiSSID.length() <= 0) {
-      Serial.println("Keine WiFi Verbindung möglich.");
-      Serial.println("Bitte WPS Taste am Router und am Gerät drücken.");
-      return;
+        Serial.println("Keine WiFi Verbindung möglich.");
+        Serial.println("Bitte WPS Taste am Router und am Gerät drücken.");
+        return;
     }
 
     Serial.printf("Verbindung mit '%s' wird hergestellt.\n", wifiSSID.c_str());
@@ -115,17 +114,17 @@ void setup()
     WiFi.hostname(wifiHostname);
     int retry = 0;
     while ((WiFi.status() == WL_DISCONNECTED) && (retry < 15)) {
-      delay(500);
-      Serial.print(".");
-      retry++;
+        delay(500);
+        Serial.print(".");
+        retry++;
     }
 
     wl_status_t status = WiFi.status();
     if(status == WL_CONNECTED) {
-      Serial.println("verbunden.");
-      Serial.printf("SSID: '%s'\n", WiFi.SSID().c_str());
-      Serial.printf("IP address: '%s'\n", WiFi.localIP().toString().c_str());
-      espLed.FadeOn(1000);
+        Serial.println("verbunden.");
+        Serial.printf("SSID: '%s'\n", WiFi.SSID().c_str());
+        Serial.printf("IP: '%s'\n", WiFi.localIP().toString().c_str());
+        espLed.FadeOn(1000);
     }
 
     attachInterrupt(digitalPinToInterrupt(SENSOR_PIN), ISRoutine, RISING);
@@ -136,7 +135,7 @@ void setup()
 }
 
 void loop() {
-  wpsButton.read();
-  espLed.Update();
-  if(bellSignalDetected) call();
+    wpsButton.read();
+    espLed.Update();
+    if(bellSignalDetected) call();
 }
