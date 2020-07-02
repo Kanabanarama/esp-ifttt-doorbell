@@ -10,10 +10,12 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <EasyButton.h>
+#include <jled.h>
 
 #include "config.h"
 
 EasyButton wpsButton(WPS_PIN);
+auto espLed = JLed(ESP_LED).LowActive();
 
 String wifiHostname = "ESPKlingel-" + String(ESP.getChipId(), HEX);
 
@@ -31,6 +33,8 @@ void call() {
   if(WiFi.status() != WL_CONNECTED) return;
 
   bellSignalDetected = false;
+
+  espLed.Breathe(1000).Repeat(3);
 
   WiFiClient client;
   HTTPClient http;
@@ -50,34 +54,32 @@ void call() {
   Serial.println(payload);
   Serial.println("--------------");
 
+  espLed.FadeOn(1000).DelayBefore(1000);
+
   http.end();
 }
 
 bool startWpsConfiguration() {
   Serial.println("WPS-Konfiguration gestartet.");
-  digitalWrite(WPS_LED, LOW);
+  espLed.On().Update();
   bool wpsSuccess = WiFi.beginWPSConfig();
   if(wpsSuccess) {
       String newSSID = WiFi.SSID();
       if(newSSID.length() > 0) {
         Serial.printf("WPS-Konfiguration erfolgreich. SSID: '%s'\n", newSSID.c_str());
-      } else {
-        wpsSuccess = false;
       }
   } else {
     Serial.println("WPS-Konfiguration fehlgeschlagen.");
   }
-  digitalWrite(WPS_LED, HIGH);
-  Serial.println(wpsSuccess);
+  espLed.Off().Update();
   return wpsSuccess;
 }
 
 bool eraseWpsConfiguration() {
   Serial.println("Resetting WPS data.");
-  digitalWrite(WPS_LED, LOW);
+  espLed.On().DelayAfter(500).Update();
   ESP.eraseConfig();
-  delay(1000);
-  digitalWrite(WPS_LED, HIGH);
+  espLed.Off().Update();
   ESP.reset();
 
   return true;
@@ -86,15 +88,12 @@ bool eraseWpsConfiguration() {
 void setup()
 {
     pinMode(WPS_PIN, INPUT_PULLUP);
-    pinMode(WPS_LED, OUTPUT);
-    digitalWrite(WPS_LED, HIGH);
     pinMode(SENSOR_PIN, INPUT);
     pinMode(SENSOR_PIN_INVERTED, INPUT);
 
-    delay(1000);
-    Serial.begin(9600);
-    delay(1000);
+    espLed.Off().Update();
 
+    Serial.begin(9600);
     Serial.printf("Ready (%s)\n", wifiHostname.c_str());
 
     wpsButton.onPressed(startWpsConfiguration);
@@ -126,13 +125,18 @@ void setup()
       Serial.println("verbunden.");
       Serial.printf("SSID: '%s'\n", WiFi.SSID().c_str());
       Serial.printf("IP address: '%s'\n", WiFi.localIP().toString().c_str());
+      espLed.FadeOn(1000);
     }
 
     attachInterrupt(digitalPinToInterrupt(SENSOR_PIN), ISRoutine, RISING);
     attachInterrupt(digitalPinToInterrupt(SENSOR_PIN_INVERTED), ISRoutine, FALLING);
+
+    // To check if IFTTT calls work:
+    //call();
 }
 
 void loop() {
   wpsButton.read();
+  espLed.Update();
   if(bellSignalDetected) call();
 }
