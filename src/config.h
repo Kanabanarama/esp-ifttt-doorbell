@@ -5,5 +5,9 @@
 
 #define SENSOR_PIN D1
 #define SENSOR_PIN_INVERTED D2
+
 #define WPS_PIN D3
 #define WPS_LED LED_BUILTIN
+
+#define OPENER_PIN D4
+#define CONTACT_DURATION 2000

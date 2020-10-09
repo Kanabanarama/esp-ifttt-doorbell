@@ -30,11 +30,11 @@
 auto espLed = JLed(ESP_LED).LowActive();
 Wps wpsWizard = Wps(WPS_PIN, WPS_LED);
 Klingel doorbell = Klingel(SENSOR_PIN, SENSOR_PIN_INVERTED);
-Oeffner opener = Oeffner();
+Oeffner opener = Oeffner(OPENER_PIN, CONTACT_DURATION);
 
 void setup() {
     Serial.begin(9600);
-    espLed.Off().Update();
+    espLed.On().Update();
     wpsWizard.setup();
     doorbell.setup();
     opener.setup();
