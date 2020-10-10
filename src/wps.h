@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <DNSServer.h>
 #include <EasyButton.h>
 #include <jled.h>
 
@@ -8,7 +9,9 @@
 class Wps
 {
   private:
-    String wifiHostname = "ESPKlingel-" + String(ESP.getChipId(), HEX);
+    //String wifiHostname = "ESPKlingel-" + String(ESP.getChipId(), HEX);
+    String wifiHostname = "klingel";
+    DNSServer dnsServer;
     uint8_t wpsButtonPin;
     uint8_t wpsLedPin;
     EasyButton wpsButton;
