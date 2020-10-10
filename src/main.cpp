@@ -7,14 +7,15 @@
  *
  */
 
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
+//#include <ESP8266WiFi.h>
+//#include <ESP8266HTTPClient.h>
 #include <EasyButton.h>
 #include <jled.h>
 
 #include "config.h"
 
 #include "wps.h"
+#include "webserver.h"
 
 #define USE_AS_BELL true
 #define USE_AS_OPENER false
@@ -31,11 +32,13 @@ auto espLed = JLed(ESP_LED).LowActive();
 Wps wpsWizard = Wps(WPS_PIN, WPS_LED);
 Klingel doorbell = Klingel(SENSOR_PIN, SENSOR_PIN_INVERTED);
 Oeffner opener = Oeffner(OPENER_PIN, CONTACT_DURATION);
+Webserver webserver = Webserver();
 
 void setup() {
     Serial.begin(9600);
     espLed.On().Update();
     wpsWizard.setup();
+    webserver.setup();
     doorbell.setup();
     opener.setup();
 }
@@ -43,6 +46,7 @@ void setup() {
 void loop() {
     espLed.Update();
     wpsWizard.loop();
+    webserver.loop();
     doorbell.loop();
     opener.loop();
 }
