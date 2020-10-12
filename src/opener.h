@@ -5,6 +5,7 @@
 class Oeffner {
   private:
     boolean open;
+    boolean latched;
     uint8_t pin;
     int duration;
     int remaining;

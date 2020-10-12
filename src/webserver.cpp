@@ -104,12 +104,12 @@ const char index_html[] PROGMEM = R"rawliteral(<!DOCTYPE HTML>
     }
     .status {
       float: right;
-      color: dark-green;
+      color: darkgreen;
     }
   </style>
 </head>
 <body>
-  <h2>ESP-Klingel</h2>
+  <p>ESP-Klingel</p>
   %PLACEHOLDER%
   <div class="container">
     <div class="wrap">
@@ -153,16 +153,18 @@ class CaptiveRequestHandler : public AsyncWebHandler {
 };
 
 AsyncWebServer server(80);
+vector<string> signals;
 
 void Webserver::setup() {
   server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    Serial.println("New client.");
     request->send_P(200, "text/html", index_html, processor);
   });
 
   server.on("/open", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    Serial.println("Opening door.");
+    signals.push_back("open");
     request->send(200, "text/plain", "OK");
   });
 
@@ -170,3 +172,14 @@ void Webserver::setup() {
 }
 
 void Webserver::loop() {}
+
+boolean Webserver::received(string signalName) {
+  //return std::find(signals.begin(), signals.end(), signalName) != signals.end();
+  vector<string>::iterator result = find(signals.begin(), signals.end(), signalName);
+  boolean found = false;
+  if (result != signals.end()) {
+    signals.erase(result);
+    found = true;
+  }
+  return found;
+}

@@ -21,6 +21,7 @@ bool Wps::startWpsConfiguration() {
 bool Wps::eraseWpsConfiguration() {
     Serial.println("WPS-Daten zurückgesetzt.");
     wpsLed.On().DelayAfter(500).Update();
+    delay(500);
     ESP.eraseConfig();
     wpsLed.Off().Update();
     ESP.reset();
@@ -71,7 +72,9 @@ void Wps::setup() {
       Serial.printf("SSID: '%s'\n", WiFi.SSID().c_str());
       Serial.printf("IP: '%s'\n", WiFi.localIP().toString().c_str());
       Serial.printf("HOSTNAME '%s'\n", this->wifiHostname.c_str());
-      wpsLed.FadeOn(1000);
+      wpsLed.On();
+      delay(500);
+      wpsLed.Off();
   }
 }
 

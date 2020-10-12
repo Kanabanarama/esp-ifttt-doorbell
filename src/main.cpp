@@ -7,8 +7,6 @@
  *
  */
 
-//#include <ESP8266WiFi.h>
-//#include <ESP8266HTTPClient.h>
 #include <EasyButton.h>
 #include <jled.h>
 
@@ -49,4 +47,9 @@ void loop() {
     webserver.loop();
     doorbell.loop();
     opener.loop();
+
+    if(webserver.received("open")) {
+      Serial.println("Received request to open door");
+      opener.pulse();
+    }
 }

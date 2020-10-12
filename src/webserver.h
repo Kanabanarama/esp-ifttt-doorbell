@@ -6,9 +6,14 @@
   #include <ESPAsyncTCP.h>
 #endif
 #include <ESPAsyncWebServer.h>
+#include <vector>
+#include <string>
+
+using namespace std;
 
 class Webserver {
   public:
     void setup();
     void loop();
+    boolean received(string signalName);
 };
