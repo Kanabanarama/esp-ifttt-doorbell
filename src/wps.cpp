@@ -47,6 +47,8 @@ void Wps::setup() {
   String wifiSSID = WiFi.SSID().c_str();
   String wifiPSK = WiFi.psk().c_str();
 
+  WiFi.mode(WIFI_STA);
+
   if(wifiSSID.length() <= 0) {
       Serial.println("Keine WiFi Verbindungsdaten gefunden. Zum Setup bitte WPS Taste am Router und am Gerät drücken.");
       WiFi.softAP(this->wifiHostname);
@@ -56,7 +58,6 @@ void Wps::setup() {
   }
 
   Serial.printf("Verbindung mit '%s' wird hergestellt.\n", wifiSSID.c_str());
-  WiFi.mode(WIFI_STA);
   WiFi.begin(wifiSSID, wifiPSK);
   WiFi.hostname(this->wifiHostname);
   int retry = 0;

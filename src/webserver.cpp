@@ -76,13 +76,11 @@ const char index_html[] PROGMEM = R"rawliteral(<!DOCTYPE HTML>
     </style>
   </head>
   <body>
-
     <div class="container">
       <div class="top">
         <span class="title">ESP-Kl<span class="the-i">I</span>ngel</span>
         <span class="status">&#11044; ONLINE</span>
       </div>
-
       <button class="button" onclick="sendOpenRequest()">&#128274;</button>
     </div>
     <script>
