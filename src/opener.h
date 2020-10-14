@@ -1,17 +1,16 @@
 #include <Arduino.h>
+#include <Ticker.h>
 
 #include "config.h"
 
 class Oeffner {
   private:
-    boolean open;
-    boolean latched;
     uint8_t pin;
     int duration;
-    int remaining;
+
   public:
-    Oeffner(uint8_t pin, int duration);
-    void pulse();
+    Oeffner(uint8_t pin);
+    void latchFor(unsigned int duration);
     void setup();
     void loop();
 };

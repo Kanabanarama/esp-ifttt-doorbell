@@ -29,16 +29,15 @@
 auto espLed = JLed(ESP_LED).LowActive();
 Wps wpsWizard = Wps(WPS_PIN, WPS_LED);
 Klingel doorbell = Klingel(SENSOR_PIN, SENSOR_PIN_INVERTED);
-Oeffner opener = Oeffner(OPENER_PIN, CONTACT_DURATION);
+Oeffner opener = Oeffner(OPENER_PIN);
 Webserver webserver = Webserver();
 
 void setup() {
-    Serial.begin(9600);
-    espLed.On().Update();
-    wpsWizard.setup();
-    webserver.setup();
     doorbell.setup();
     opener.setup();
+    Serial.begin(9600);
+    wpsWizard.setup();
+    webserver.setup();
 }
 
 void loop() {
@@ -50,6 +49,6 @@ void loop() {
 
     if(webserver.received("open")) {
       Serial.println("Received request to open door");
-      opener.pulse();
+      opener.latchFor(CONTACT_DURATION);
     }
 }

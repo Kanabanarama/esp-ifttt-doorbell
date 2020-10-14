@@ -1,131 +1,98 @@
 #include <webserver.h>
 
+vector<string> signals;
+
 const char index_html[] PROGMEM = R"rawliteral(<!DOCTYPE HTML>
 <html>
-<head>
-  <title>ESP-Doorbell</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:,">
-  <style>
-    *, *:after, *:before {
-      box-sizing: border-box;
-    }
-    body {
-      display: -webkit-box;
-      display: -moz-box;
-      display: box;
-      display: -webkit-flex;
-      display: -moz-flex;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-align-content: center;
-      -moz-align-content: center;
-      align-content: center;
-      -ms-flex-line-pack: center;
-      color: #353535;
-      min-height: 100vh;
-      font-family: 'Open Sans', sans-serif;
-      font-size: 14px;
-      text-align: center;
-      background-color: lightgreen;
-    }
-    .container {
-      padding: 60px 80px;
-      background-color: white;
-      box-shadow: 0 0 4px 1px #BBB;
-      margin: auto;
-      text-align: center;
-    }
-    .wrap {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      margin: 20px auto 30px auto;
-    }
-    .wrap:last-child {
-      margin-bottom: 0;
-    }
-    .clicker {
-      background-color: white;
-      outline: none;
-      font-size: 50px;
-      font-weight: 600;
-      position: absolute;
-      cursor: pointer;
-      padding: 0;
-      border: none;
-      height: 64px;
-      width: 64px;
-      left: 8px;
-      top: 8px;
-      border-radius: 100px;
-      z-index: 2;
-    }
-    .clicker:active {
-      transform: translate(0, 1px);
-      height: 63px;
-      box-shadow: 0px 1px 0 0 #bebebe inset;
-    }
-    .circle {
-      position: relative;
-      border-radius: 40px;
-      width: 80px;
-      height: 80px;
-      z-index: 1;
-    }
-    .circle.third {
-      border-radius: 0;
-    }
-    .clicker.faster:hover + .circle, .clicker.faster:active + .circle {
-      animation: rotator linear .4s infinite;
-    }
-    .clicker.fast:hover + .circle, .clicker.fast:active + .circle {
-      animation: rotator linear .5s infinite;
-    }
-    .clicker:hover + .circle, .clicker:active + .circle {
-      animation: rotator linear .8s infinite;
-    }
-    @keyframes rotator {
-      from {
-        transform: rotate(0deg);
+  <head>
+    <title>ESP-Doorbell</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <style type="text/css">
+      body {
+        display: -webkit-box;
+        display: -moz-box;
+        display: box;
+        display: -webkit-flex;
+        display: -moz-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-align-content: center;
+        -moz-align-content: center;
+        align-content: center;
+        -ms-flex-line-pack: center;
+        color: #353535;
+        min-height: 100vh;
+        font-family: "Open Sans", sans-serif;
+        font-size: 14px;
+        text-align: center;
+        background-color: lightgreen;
       }
-      to {
-        transform: rotate(360deg);
+      .top {
+        width: 100%;
+        position: absolute;
+        text-align: left;
+        top: 0;
+        left: 0;
       }
-    }
-    .angled {
-      background-image: linear-gradient(45deg, white 0%, white 30%, #14beeb 30%, #14beeb 70%, white 70%, white 100%);
-    }
-    .angled.second {
-      background-image: linear-gradient(white 0%, white 30%, #faa078 30%, #faa078 70%, white 70%, white 100%);
-    }
-    .angled.third {
-      background-image: linear-gradient(45deg, white 0%, white 30%, #82e687 30%, #82e687 70%, white 70%, white 100%);
-    }
-    .status {
-      float: right;
-      color: darkgreen;
-    }
-  </style>
-</head>
-<body>
-  <p>ESP-Klingel</p>
-  %PLACEHOLDER%
-  <div class="container">
-    <div class="wrap">
-    <button class="clicker" onclick="sendOpenRequest()">&#128274;</button>
-      <div class="circle angled"></div>
+      .container {
+        margin: auto;
+        text-align: center;
+      }
+      .button {
+        padding: 35px 45px;
+        font-size: 66px;
+        text-align: center;
+        cursor: pointer;
+        outline: none;
+        color: #fff;
+        background-color: #cf5808;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 9px #999;
+      }
+      .button:active {
+        box-shadow: 0 3px rgb(56, 56, 56);
+        transform: translateY(4px);
+      }
+      .title {
+        position: relative;
+        top: 20px;
+        left: 10px;
+        font-size: 16px;
+      }
+      .the-i {
+        font-style: bolder;
+        color: darkgreen;
+      }
+      .status {
+        position: relative;
+        top: 6px;
+        left: -30px;
+        font-size: 12px;
+        color: darkgreen;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="top">
+        <span class="title">ESP-Kl<span class="the-i">I</span>ngel</span>
+        <span class="status">&#11044; ONLINE</span>
+      </div>
+
+      <button class="button" onclick="sendOpenRequest()">&#128274;</button>
     </div>
-  </div>
-</div>
-<script>
-  function sendOpenRequest() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/open", true);
-    xhr.send();
-  }
-</script>
-</body>
+    <script>
+      function sendOpenRequest() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/open", true);
+        xhr.send();
+      }
+    </script>
+  </body>
 </html>
 )rawliteral";
 
@@ -147,19 +114,43 @@ class CaptiveRequestHandler : public AsyncWebHandler {
     }
 
     void handleRequest(AsyncWebServerRequest *request) {
-      Serial.println(request->url().c_str());
-      request->send_P(200, "text/html", index_html, processor);
+      String path = request->url().c_str();
+
+      if(path == "/") {
+        if (!request->authenticate(USERNAME, PASSWORD)) {
+          return request->requestAuthentication();
+        }
+        Serial.println("New client in AP mode.");
+        request->send_P(200, "text/html", index_html, processor);
+      }
+
+      if(path == "/open") {
+        if (!request->authenticate(USERNAME, PASSWORD)) {
+          return request->requestAuthentication();
+        }
+        signals.push_back("open");
+        request->send(200, "text/plain", "OK");
+      }
     }
 };
 
+boolean Webserver::received(string signalName) {
+  vector<string>::iterator result = find(signals.begin(), signals.end(), signalName);
+  boolean found = false;
+  if (result != signals.end()) {
+    signals.erase(result);
+    found = true;
+  }
+  return found;
+}
+
 AsyncWebServer server(80);
-vector<string> signals;
 
 void Webserver::setup() {
   server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("New client.");
+    Serial.println("New client in STA mode.");
     request->send_P(200, "text/html", index_html, processor);
   });
 
@@ -172,14 +163,3 @@ void Webserver::setup() {
 }
 
 void Webserver::loop() {}
-
-boolean Webserver::received(string signalName) {
-  //return std::find(signals.begin(), signals.end(), signalName) != signals.end();
-  vector<string>::iterator result = find(signals.begin(), signals.end(), signalName);
-  boolean found = false;
-  if (result != signals.end()) {
-    signals.erase(result);
-    found = true;
-  }
-  return found;
-}
