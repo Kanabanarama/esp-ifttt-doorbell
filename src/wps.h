@@ -18,8 +18,8 @@ class Wps
     static JLed wpsLed;
     static bool bellSignalDetected;
 
-    static bool startWpsConfiguration();
-    static bool eraseWpsConfiguration();
+    static void startWpsConfiguration();
+    static void eraseWpsConfiguration();
 
   public:
     Wps(uint8_t buttonPin, uint8_t ledPin);

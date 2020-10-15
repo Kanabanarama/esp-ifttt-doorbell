@@ -2,7 +2,7 @@
 
 JLed Wps::wpsLed(WPS_LED);
 
-bool Wps::startWpsConfiguration() {
+void Wps::startWpsConfiguration() {
     Serial.println("WPS-Konfiguration gestartet.");
     wpsLed.On().Update();
     bool wpsSuccess = WiFi.beginWPSConfig();
@@ -10,22 +10,21 @@ bool Wps::startWpsConfiguration() {
         String newSSID = WiFi.SSID();
         if(newSSID.length() > 0) {
             Serial.printf("WPS-Konfiguration erfolgreich. SSID: '%s'\n", newSSID.c_str());
+            ESP.restart();
         }
     } else {
         Serial.println("WPS-Konfiguration fehlgeschlagen.");
     }
     wpsLed.Off().Update();
-    return wpsSuccess;
 }
 
-bool Wps::eraseWpsConfiguration() {
-    Serial.println("WPS-Daten zurückgesetzt.");
+void Wps::eraseWpsConfiguration() {
     wpsLed.On().DelayAfter(500).Update();
     delay(500);
     ESP.eraseConfig();
+    Serial.println("WPS-Daten zurückgesetzt.");
     wpsLed.Off().Update();
     ESP.reset();
-    return true;
 }
 
 Wps::Wps(uint8_t buttonPin, uint8_t ledPin)
@@ -41,8 +40,8 @@ Wps::Wps(uint8_t buttonPin, uint8_t ledPin)
 void Wps::setup() {
   pinMode(this->wpsButtonPin, INPUT_PULLUP);
 
-  this->wpsButton.onPressed(startWpsConfiguration);
-  this->wpsButton.onPressedFor(3000, eraseWpsConfiguration);
+  this->wpsButton.onPressed(Wps::startWpsConfiguration);
+  this->wpsButton.onPressedFor(3000, Wps::eraseWpsConfiguration);
 
   String wifiSSID = WiFi.SSID().c_str();
   String wifiPSK = WiFi.psk().c_str();
