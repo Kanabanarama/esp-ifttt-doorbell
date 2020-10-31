@@ -6,11 +6,13 @@
 class Oeffner {
   private:
     uint8_t pin;
-    int duration;
+    boolean latched;
+    unsigned long start;
+    unsigned int duration;
 
   public:
     Oeffner(uint8_t pin);
-    void latchFor(unsigned int duration);
+    void latchFor(unsigned long duration);
     void setup();
     void loop();
 };
