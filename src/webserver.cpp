@@ -41,19 +41,21 @@ const char index_html[] PROGMEM = R"rawliteral(<!DOCTYPE HTML>
         text-align: center;
       }
       .button {
-        padding: 35px 45px;
-        font-size: 66px;
+        width: 200px;
+        height: 200px;
+        font-size: 160px;
         text-align: center;
         cursor: pointer;
         outline: none;
-        color: #fff;
-        background-color: #cf5808;
+        color: #999;
+        background-color: #fff;
         border: none;
         border-radius: 12px;
         box-shadow: 0 9px #999;
       }
       .button:active {
-        box-shadow: 0 3px rgb(56, 56, 56);
+        color: #999;
+        box-shadow: 0 3px #333;
         transform: translateY(4px);
       }
       .title {
@@ -129,6 +131,13 @@ class CaptiveRequestHandler : public AsyncWebHandler {
         signals.push_back("open");
         request->send(200, "text/plain", "OK");
       }
+      if(path == "/connect") {
+        if (!request->authenticate(USERNAME, PASSWORD)) {
+          return request->requestAuthentication();
+        }
+        signals.push_back("connect");
+        request->send(200, "text/plain", "OK");
+      }
     }
 };
 
@@ -154,6 +163,11 @@ void Webserver::setup() {
 
   server.on("/open", HTTP_GET, [] (AsyncWebServerRequest *request) {
     signals.push_back("open");
+    request->send(200, "text/plain", "OK");
+  });
+
+  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    signals.push_back("update");
     request->send(200, "text/plain", "OK");
   });
 

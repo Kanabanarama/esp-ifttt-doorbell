@@ -13,10 +13,12 @@
 #include "config.h"
 
 #include "wps.h"
+#include "ota.h"
 #include "webserver.h"
 
+#define ENABLE_OTA true
 #define USE_AS_BELL true
-#define USE_AS_OPENER false
+#define USE_AS_OPENER true
 
 #ifdef USE_AS_BELL
   #include "klingel.h"
@@ -28,6 +30,7 @@
 
 auto espLed = JLed(ESP_LED).LowActive();
 Wps wpsWizard = Wps(WPS_PIN, WPS_LED);
+Ota otaUpdates = Ota();
 Klingel doorbell = Klingel(SENSOR_PIN, SENSOR_PIN_INVERTED);
 Oeffner opener = Oeffner(OPENER_PIN);
 Webserver webserver = Webserver();
@@ -38,6 +41,7 @@ void setup() {
     Serial.begin(9600);
     wpsWizard.setup();
     webserver.setup();
+    otaUpdates.setup();
 }
 
 void loop() {
@@ -47,6 +51,14 @@ void loop() {
     doorbell.loop();
     opener.loop();
 
+    if(webserver.received("connect")) {
+      Serial.println("Received request for WPS setup");
+      wpsWizard.startWpsConfiguration();
+    }
+    if(webserver.received("update")) {
+      Serial.println("Received request for OTA update");
+      otaUpdates.check();
+    }
     if(webserver.received("open")) {
       Serial.println("Received request to open door");
       opener.latchFor(CONTACT_DURATION);

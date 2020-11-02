@@ -49,7 +49,7 @@ void Wps::setup() {
   WiFi.mode(WIFI_STA);
 
   if(wifiSSID.length() <= 0) {
-      Serial.println("Keine WiFi Verbindungsdaten gefunden. Zum Setup bitte WPS Taste am Router und am Gerät drücken.");
+      Serial.println("Keine WiFi Verbindungsdaten gefunden. Zum Setup bitte WPS Taste am Router und am Gerät (3 Sekunden) drücken.");
       WiFi.softAP(this->wifiHostname);
       this->dnsServer.start(53, "*", WiFi.softAPIP());
       Serial.printf("Benutzung als Accesspoint aktiv. WIFI-SSID: '%s'\n", this->wifiHostname.c_str());

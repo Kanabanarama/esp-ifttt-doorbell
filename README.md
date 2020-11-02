@@ -22,6 +22,10 @@ The esp-doorbell LED will fade on after a few seconds to notify its successful W
 
 By opening http://klingel you get to the dashboard that lets you open the door by pressing a button in the served dashboard page. (remotely -coming soon-, http://buymeacoffee.com/kanabanarama :) )
 
+By opening http://klingel/update you can start an OTA update if a new firmware is available.
+
+In Access point mode, by opening http://klingel/connect you can start WPS setup without a hardware button (e.g. on a WeMos).
+
 When the connected esp-doorbell is receiving a signal or an inverted signal on the configured pin, it will send a trigger request to an IFTTT event where you can throw in all the evil automation manifestations of your choosing. For example your cellphone could ring by combining [Maker Hooks](https://ifttt.com/maker_webhooks) with [VoipCalls](https://ifttt.com/voip_calls).
 
 TLDR;
